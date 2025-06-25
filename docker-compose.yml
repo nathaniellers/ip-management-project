@@ -1,0 +1,12 @@
+services:
+  gateway:
+    build: ./gateway-service-fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+
+  auth-service:
+    build: ./auth-service-fastapi
+    ports:
+      - "8001:8001"

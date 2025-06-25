@@ -3,7 +3,10 @@ uvicorn
 python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
+pydantic-settings
 redis
 pytest
 httpx
 pytest-mock
+pydantic[email]
+python-multipart
