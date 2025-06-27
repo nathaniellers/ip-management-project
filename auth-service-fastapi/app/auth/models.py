@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, field_serializer
 from uuid import UUID
+from enum import Enum
 
 class Token(BaseModel):
 	access_token: str
@@ -19,11 +20,16 @@ class UserJWT(BaseModel):
 	def serialize_id(self, value: UUID, _info):
 		return str(value)
 
+class UserType(str, Enum):
+	ADMIN = "admin"
+	USER = "user"
+
 class User(BaseModel):
 	id: UUID
 	email: EmailStr
 	full_name: Optional[str] = None
 	disabled: Optional[bool] = None
+	type: UserType
 
 class UserInDB(User):
 	hashed_password: str

@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Request, Depends
+from app.database.schemas import LoginRequest
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database.db import get_db
-
 from fastapi.security import OAuth2PasswordRequestForm
-
 from app.auth.models import Token, User, UserLogin, UserCreate
 from app.auth.security import oauth2_scheme, get_current_user
 from app.auth.services import process_login, process_logout, save_user_to_db
@@ -13,7 +12,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 @router.post("/login", response_model=Token)
-async def login_user(request: Request, user_login: UserLogin, db: Session = Depends(get_db)):
+async def login_user(request: LoginRequest, user_login: UserLogin, db: Session = Depends(get_db)):
 	return await process_login(request, user_login.email, user_login.password, "login", db)
 
 @router.post("/logout")
@@ -32,3 +31,7 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
 		"full_name": new_user.full_name,
 		"message": "User registered successfully"
 	}
+
+@router.post("/token", response_model=Token)
+async def login_token(request: Request, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+	return await process_login(request, form_data.username, form_data.password, "token")

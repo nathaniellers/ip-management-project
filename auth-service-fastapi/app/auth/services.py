@@ -10,7 +10,7 @@ from app.config import settings
 from app.database.redis_db import is_token_blacklisted, add_token_to_blacklist
 from app.auth.models import RefreshRequest
 from app.database.models import User
-from app.auth.models import UserCreate, UserInDB
+from app.auth.models import UserCreate
 from app.database.crud_user import get_password_hash
 
 async def process_login(request: Request, username: str, password: str, endpoint: str, db: Session):

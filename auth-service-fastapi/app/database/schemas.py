@@ -12,6 +12,10 @@ class UserLogin(BaseModel):
   full_name: str
   disabled: bool
 
+class LoginRequest(BaseModel):
+  email: EmailStr
+  password: str
+
 class Token(BaseModel):
   access_token: str
   refresh_token: str
