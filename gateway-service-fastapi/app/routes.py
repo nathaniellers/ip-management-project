@@ -3,8 +3,8 @@ import httpx
 
 router = APIRouter()
 
-AUTH_SERVICE_URL = "http://auth-service:8001/api"
-IP_SERVICE_URL = "http://ip-service:8002/api"
+AUTH_SERVICE_URL = "http://localhost:8001/api"
+IP_SERVICE_URL = "http://localhost:8002/api"
 
 @router.post("/login")
 async def login(request: Request):
@@ -16,5 +16,5 @@ async def login(request: Request):
 @router.get("/ips")
 async def get_ips():
 	async with httpx.AsyncClient() as client:
-		response = await client.get(f"{IP_SERVICE_URL}/ips")
+			response = await client.get(f"{IP_SERVICE_URL}/ips")
 	return response.json()

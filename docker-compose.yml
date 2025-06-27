@@ -1,12 +1,37 @@
 services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  auth-service:
+    build:
+      context: ./auth-service-fastapi
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/auth_db
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
   gateway:
-    build: ./gateway-service-fastapi
+    build:
+      context: ./gateway-service-fastapi
     ports:
       - "8000:8000"
     depends_on:
       - auth-service
+    networks:
+      - app-network
 
-  auth-service:
-    build: ./auth-service-fastapi
-    ports:
-      - "8001:8001"
+networks:
+  app-network:
+    driver: bridge
