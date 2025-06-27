@@ -1,12 +1,13 @@
-FROM python:3.9.6
+FROM python:3.9
 
 WORKDIR /app
 
-COPY . .
+RUN apt-get update && apt-get install -y netcat-openbsd gcc
 
-ENV PYTHONUNBUFFERED=1
-ENV ENV_FILE_PATH=.env
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]

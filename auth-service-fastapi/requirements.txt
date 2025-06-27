@@ -1,7 +1,8 @@
 fastapi
 uvicorn
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt==3.2.0
+passlib==1.7.4
 python-dotenv
 pydantic-settings
 redis
@@ -10,3 +11,5 @@ httpx
 pytest-mock
 pydantic[email]
 python-multipart
+sqlalchemy
+psycopg2-binary

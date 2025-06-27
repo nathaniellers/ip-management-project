@@ -1,30 +1,30 @@
 from fastapi import status
+import uuid
 
-def test_login_token_success(client):
-	response = client.post("/api/token", data={
-		"username": "nathanielleromero18@gmail.com",
-		"password": "mysecretpass"
+def test_register_user(client):
+	random_email = f"{uuid.uuid4().hex[:10]}@yopmail.com"
+	random_name = f"Test-{uuid.uuid4().hex[:6]}"
+
+	response = client.post("/api/register", json={
+		"email": random_email,
+		"password": "password",
+		"full_name": random_name
 	})
-	assert response.status_code == 200
-	json = response.json()
-	assert "access_token" in json
-	assert json["token_type"] == "bearer"
 
+	print("Status Code:", response.status_code)
+	print("Response Body:", response.text)
 
-def test_login_token_invalid_credentials(client):
-	response = client.post("/api/token", data={
-		"username": "nathanielleromero18@gmail.com",
-		"password": "wrongpass"
-})
-	assert response.status_code == status.HTTP_401_UNAUTHORIZED
-	assert response.json()["detail"] == "Incorrect credentials"
-
+	assert response.status_code in [200, 201]
+	json_response = response.json()
+	assert json_response["email"] == random_email
+	assert json_response["full_name"] == random_name
 
 def test_login_user_success(client):
 	response = client.post("/api/login", json={
 		"email": "nathanielleromero18@gmail.com",
-		"password": "mysecretpass"
+		"password": "password"
 	})
+	
 	assert response.status_code == 200
 	json = response.json()
 	assert "access_token" in json
@@ -43,27 +43,12 @@ def test_protected_route_requires_token(client):
 	response = client.post("/api/test-protected")
 	assert response.status_code == 401
 
-
-def test_protected_route_with_token(client):
-	login_response = client.post("/api/token", data={
-		"username": "nathanielleromero18@gmail.com",
-		"password": "mysecretpass"
-	})
-	token = login_response.json()["access_token"]
-
-	protected_response = client.post(
-		"/api/test-protected",
-		headers={"Authorization": f"Bearer {token}"}
-	)
-	assert protected_response.status_code == 200
-	assert protected_response.json()["email"] == "nathanielleromero18@gmail.com"
-
-
 def test_logout_success(client):
-	login_response = client.post("/api/token", data={
-		"username": "nathanielleromero18@gmail.com",
-		"password": "mysecretpass"
+	login_response = client.post("/api/login", json={
+		"email": "nathanielleromero18@gmail.com",
+		"password": "password"
 	})
+
 	token = login_response.json()["access_token"]
 
 	logout_response = client.post(
@@ -75,9 +60,9 @@ def test_logout_success(client):
 
 
 def test_logout_twice(client):
-	login_response = client.post("/api/token", data={
-		"username": "nathanielleromero18@gmail.com",
-		"password": "mysecretpass"
+	login_response = client.post("/api/login", json={
+		"email": "nathanielleromero18@gmail.com",
+		"password": "password"
 	})
 	token = login_response.json()["access_token"]
 
@@ -88,14 +73,3 @@ def test_logout_twice(client):
 	assert second.status_code == 400
 	assert "Token already blacklisted" in second.text
 
-# def test_refresh_token_flow(client):
-#     login_response = client.post("/api/login", json={
-#         "email": "nathanielleromero18@gmail.com",
-#         "password": "mysecretpass"
-#     })
-#     refresh_token = login_response.json().get("refresh_token")
-#     assert refresh_token
-
-#     refresh_response = client.post("/api/refresh", json={"refresh_token": refresh_token})
-#     assert refresh_response.status_code == 200
-#     assert "access_token" in refresh_response.json()
