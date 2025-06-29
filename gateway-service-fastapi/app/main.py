@@ -8,7 +8,7 @@ settings = Settings()
 
 @app.get("/")
 async def read_root():
-	return {"message": "Welcome to the JWT Gateway Microservice!"}
+	return {"message": "Welcome to the JWT Gateway Service!"}
 
 @app.post("/api/login")
 async def proxy_login(request: LoginRequest):

@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic_settings import BaseSettings
+from pydantic import AnyHttpUrl
 
 class Settings(BaseSettings):
   auth_service_url: str
@@ -6,3 +7,4 @@ class Settings(BaseSettings):
 
   class Config:
     env_file = ".env"
+
