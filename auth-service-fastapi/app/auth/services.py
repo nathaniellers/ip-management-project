@@ -18,7 +18,7 @@ async def process_login(request: Request, username: str, password: str, endpoint
 	if not user:
 		raise AuthException(detail="Incorrect credentials")
 
-	user_data = UserJWT(id=user.id, name=user.full_name, email=user.email)
+	user_data = UserJWT(id=user.id, name=user.full_name, email=user.email, role=user.role)
 	issuer = f"{request.url.scheme}://{request.url.netloc}/api/{endpoint}"
 	access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 

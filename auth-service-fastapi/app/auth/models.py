@@ -15,6 +15,7 @@ class UserJWT(BaseModel):
 	id: UUID
 	name: str
 	email: EmailStr
+	role: str
 
 	@field_serializer("id")
 	def serialize_id(self, value: UUID, _info):
@@ -29,7 +30,7 @@ class User(BaseModel):
 	email: EmailStr
 	full_name: Optional[str] = None
 	disabled: Optional[bool] = None
-	type: UserType
+	role: UserType
 
 class UserInDB(User):
 	hashed_password: str

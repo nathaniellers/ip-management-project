@@ -13,3 +13,4 @@ pydantic[email]
 python-multipart
 sqlalchemy
 psycopg2-binary
+alembic
