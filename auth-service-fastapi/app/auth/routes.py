@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Request, Depends
-from app.database.schemas import LoginRequest
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database.db import get_db
@@ -12,7 +11,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 @router.post("/login", response_model=Token)
-async def login_user(request: LoginRequest, user_login: UserLogin, db: Session = Depends(get_db)):
+async def login_user(request: Request, user_login: UserLogin, db: Session = Depends(get_db)):
 	return await process_login(request, user_login.email, user_login.password, "login", db)
 
 @router.post("/logout")
