@@ -1,15 +1,47 @@
+version: '3.8'
+
 services:
+  # Auth DB
   postgres:
     image: postgres:13
+    container_name: auth-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
+  # IP Management DB
+  ip-db:
+    image: postgres:13
+    container_name: ip-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ip_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ip-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # Auth Service
   auth-service:
     build:
       context: ./auth-service-fastapi
@@ -18,10 +50,12 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/auth_db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
 
+  # Gateway
   gateway:
     build:
       context: ./gateway-service-fastapi
@@ -32,19 +66,28 @@ services:
     networks:
       - app-network
 
+  # IP Management Service
   ip-management:
     build:
       context: ./ip-management-service-fastapi
     ports:
       - "8002:8002"
     environment:
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/auth_db
+      DATABASE_URL: postgresql://postgres:password@ip-db:5432/ip_db
     depends_on:
-      - auth-service
-      - postgres
+      ip-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      gateway:
+        condition: service_started
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  auth-db-data:
+  ip-db-data:
