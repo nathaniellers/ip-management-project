@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Header
 from app.config import Settings
+
 import httpx
 
 router = APIRouter()
@@ -13,10 +14,12 @@ async def proxy_login(request: Request):
 		return response.json()
 
 @router.post("/logout")
-async def proxy_logout(request: Request):
-	body = await request.json()
+async def proxy_logout(request: Request, authorization: str = Header(...)):
 	async with httpx.AsyncClient() as client:
-		response = await client.post(f"{settings.AUTH_SERVICE_URL}/api/logout", json=body)
+		response = await client.post(
+				f"{settings.AUTH_SERVICE_URL}/api/logout",
+				headers={"Authorization": authorization}
+		)
 		return response.json()
 	
 @router.post("/register")
