@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings
 from pydantic import AnyHttpUrl
 
 class Settings(BaseSettings):
-  auth_service_url: str
-  ip_service_url: str
+  AUTH_SERVICE_URL: str
+  IP_SERVICE_URL: str
 
   class Config:
     env_file = ".env"

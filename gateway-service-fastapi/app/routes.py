@@ -1,20 +1,39 @@
 from fastapi import APIRouter, Request
+from app.config import Settings
 import httpx
 
 router = APIRouter()
-
-AUTH_SERVICE_URL = "http://localhost:8001/api"
-IP_SERVICE_URL = "http://localhost:8002/api"
+settings = Settings()
 
 @router.post("/login")
-async def login(request: Request):
-	data = await request.json()
+async def proxy_login(request: Request):
+	body = await request.json()
 	async with httpx.AsyncClient() as client:
-		response = await client.post(f"{AUTH_SERVICE_URL}/login", json=data)
+		response = await client.post(f"{settings.AUTH_SERVICE_URL}/api/login", json=body)
+		return response.json()
+
+@router.post("/logout")
+async def proxy_logout(request: Request):
+	body = await request.json()
+	async with httpx.AsyncClient() as client:
+		response = await client.post(f"{settings.AUTH_SERVICE_URL}/api/logout", json=body)
+		return response.json()
+	
+@router.post("/register")
+async def proxy_register(request: Request):
+	body = await request.json()
+	async with httpx.AsyncClient() as client:
+		response = await client.post(f"{settings.AUTH_SERVICE_URL}/api/register", json=body)
+		return response.json()
+	
+@router.get("/ip")
+async def get_ip():
+	async with httpx.AsyncClient() as client:
+		response = await client.get(f"{settings.IP_SERVICE_URL}/ip")
 	return response.json()
 
-@router.get("/ips")
-async def get_ips():
+@router.post("/ip")
+async def create_ip():
 	async with httpx.AsyncClient() as client:
-			response = await client.get(f"{IP_SERVICE_URL}/ips")
+		response = await client.get(f"{settings.IP_SERVICE_URL}/ip")
 	return response.json()
