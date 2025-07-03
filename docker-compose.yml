@@ -6,6 +6,7 @@ services:
     image: postgres:13
     container_name: auth-db
     environment:
+      TZ: Asia/Manila
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: auth_db
@@ -21,11 +22,22 @@ services:
     networks:
       - app-network
 
+  # Audit DB
+  audit-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: audit_logs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - audit-db-data:/var/lib/postgresql/data
+
   # IP Management DB
   ip-db:
     image: postgres:13
     container_name: ip-db
     environment:
+      TZ: Asia/Manila
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ip_db
@@ -48,7 +60,10 @@ services:
     ports:
       - "8001:8001"
     environment:
+      TZ: Asia/Manila
       DATABASE_URL: postgresql://postgres:password@postgres:5432/auth_db
+      RUN_MIGRATIONS: "true"
+      RUN_SEED: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,6 +81,17 @@ services:
     networks:
       - app-network
 
+  # Audit Service
+  audit-service:
+    build:
+      context: ./audit-service-fastapi
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./audit-service-fastapi/.env
+    depends_on:
+      - audit_db
+  
   # IP Management Service
   ip-management:
     build:
@@ -73,7 +99,9 @@ services:
     ports:
       - "8002:8002"
     environment:
+      TZ: Asia/Manila
       DATABASE_URL: postgresql://postgres:password@ip-db:5432/ip_db
+      RUN_MIGRATIONS: "true"
     depends_on:
       ip-db:
         condition: service_healthy
@@ -90,4 +118,5 @@ networks:
 
 volumes:
   auth-db-data:
+  audit-db-data:
   ip-db-data:
