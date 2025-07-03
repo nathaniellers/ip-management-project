@@ -7,6 +7,8 @@ class Settings(BaseSettings):
   AUTH_SERVICE_URL: str
   IP_SERVICE_URL: str
   REDIS_URL: str
+  ALLOWED_ORIGINS: str
+  TIMEZONE: str
 
   class Config:
     env_file = ".env"
