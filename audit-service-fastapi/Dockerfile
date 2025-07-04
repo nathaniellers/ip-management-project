@@ -1,7 +1,15 @@
-FROM python:3.10-slim
+FROM python:3.9
 
 WORKDIR /app
-COPY . .
+
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]
+COPY . .
+
+ENV PYTHONPATH=/app
+
+CMD sh -c "echo RUN_MIGRATIONS=$RUN_MIGRATIONS && \
+if [ \"$RUN_MIGRATIONS\" = 'true' ]; then alembic upgrade head; \
+fi && uvicorn app.main:app --host 0.0.0.0 --port 8003"
+

@@ -1,7 +1,9 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Header, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from app.config import settings
+from app.config import Settings
+
+settings = Settings()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -14,3 +16,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 		return user_data
 	except JWTError:
 		raise HTTPException(status_code=401, detail="Invalid token")
+
+def verify_internal_key(x_internal_key: str = Header(...)):
+  if x_internal_key != settings.INTERNAL_KEY:
+    raise HTTPException(
+      status_code=status.HTTP_403_FORBIDDEN,
+      detail="Invalid internal audit key"
+    )

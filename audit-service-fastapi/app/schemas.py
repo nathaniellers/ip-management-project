@@ -15,22 +15,29 @@ class AuditLogCreate(BaseModel):
   actor_id: UUID
   name: str
   action: ActionType
-  ip: str
+  ip: Optional[str] = None
   ip_id: Optional[UUID] = None
+  session_id: Optional[str]
   details: Optional[str] = ""
+  resource: Optional[str] = ""
+  timestamp: Optional[datetime] = None
 
-class AuditLogOut(AuditLogCreate):
-  timestamp: datetime
+class AuditLogOut(BaseModel):
+	id: UUID
+	actor_id: UUID
+	session_id: Optional[str]
+	name: str
+	ip: Optional[str]
+	ip_id: Optional[UUID]
+	action: ActionType
+	timestamp: datetime
+	details: Optional[str]
+	resource: Optional[str]
 
-# class AuditLogOut(BaseModel):
-# 	id: UUID
-# 	actor_id: UUID
-# 	name: str
-# 	ip: str
-# 	ip_id: Optional[UUID]
-# 	action: ActionType
-# 	timestamp: datetime
-# 	details: Optional[str]
+	class Config:
+		from_attributes = True
 
-# 	class Config:
-# 		from_attributes = True
+class ResourceType(str, Enum):
+    auth = "auth"
+    ip = "ip"
+    user = "user"

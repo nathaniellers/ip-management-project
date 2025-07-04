@@ -1,57 +1,46 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
-from app.models import AuditLog
+from typing import Optional
+from app.dependencies import verify_internal_key
+from app.database import get_db
 from app.schemas import AuditLogCreate
-from datetime import datetime
-from app.dependencies import get_current_user
-from app.services import get_audit_logs
-import pytz
+from app.services import create_audit_log_entry, get_filtered_audit_logs
+from app.config import Settings
 
-router = APIRouter()
+router = APIRouter(prefix="/api", tags=["Audit Management"])
+settings = Settings()
 
-def get_db():
-  db = SessionLocal()
-  try:
-    yield db
-  finally:
-      db.close()
-
-@router.post("/audit-log", status_code=201)
+@router.post("/logs", status_code=status.HTTP_201_CREATED)
 def create_log(
-    log: AuditLogCreate,
-    db: Session = Depends(get_db)
-  ):
-  
-  ph_timezone = pytz.timezone("Asia/Manila")
-  now_ph = datetime.now(ph_timezone)
-
-  log_entry = AuditLog(
-    actor_id=log.actor_id,
-    name=log.name,
-    action=log.action,
-    ip=log.ip,
-    ip_id=log.ip_id,
-    details=log.details,
-    timestamp=now_ph
-  )
-  db.add(log_entry)
-  db.commit()
+  log: AuditLogCreate,
+  db: Session = Depends(get_db),
+  _ = Depends(verify_internal_key)
+):
+  create_audit_log_entry(log, db)
   return {"message": "Audit log created"}
 
 @router.get("/logs")
-def get_audit_log(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(10, le=100),
-    search: str = Query(None),
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user)
-  ):
-    
-	return get_audit_logs(
-    skip,
-    limit,
-    search,
-    db,
-    user
+def get_logs(
+  db: Session = Depends(get_db),
+  search: Optional[str] = Query(None),
+  action: Optional[str] = None,
+  resource: Optional[str] = None,
+  session_id: Optional[str] = None,
+  ip: Optional[str] = None,
+  start_date: Optional[str] = None,
+  end_date: Optional[str] = None,
+  page: int = 0,
+  limit: int = 10,
+):
+  return get_filtered_audit_logs(
+    db=db,
+    search=search,
+    action=action,
+    resource=resource,
+    session_id=session_id,
+    ip=ip,
+    start_date=start_date,
+    end_date=end_date,
+    page=page,
+    limit=limit
   )

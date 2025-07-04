@@ -4,3 +4,7 @@ sqlalchemy
 psycopg2-binary
 pydantic
 python-dotenv
+alembic
+pydantic_settings
+python-jose[cryptography]
+pytz

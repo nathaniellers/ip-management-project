@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, DateTime, Enum, ForeignKey
+from sqlalchemy import Column, String, DateTime, Enum as SqlEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import enum
-import uuid
+from uuid import uuid4
 from app.database import Base
 
 class ActionType(str, enum.Enum):
@@ -15,11 +15,13 @@ class ActionType(str, enum.Enum):
 class AuditLog(Base):
   __tablename__ = "audit_logs"
 
-  id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+  id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
   actor_id = Column(UUID(as_uuid=True), nullable=False)
+  session_id = Column(String, nullable=True)
   name = Column(String, nullable=False)
-  action = Column(Enum(ActionType), nullable=False)
-  ip = Column(String, nullable=False)
+  action = Column(SqlEnum(ActionType, name="actiontype", create_type=False), nullable=False)
+  ip = Column(String, nullable=True)
   ip_id = Column(UUID(as_uuid=True), nullable=True)
   details = Column(String, default="")
+  resource = Column(String)
   timestamp = Column(DateTime(timezone=True), server_default=func.now())
