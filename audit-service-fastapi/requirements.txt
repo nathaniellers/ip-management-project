@@ -8,3 +8,4 @@ alembic
 pydantic_settings
 python-jose[cryptography]
 pytz
+pytest
