@@ -9,4 +9,8 @@ COPY . .
 
 ENV PYTHONPATH=/app
 
-CMD sh -c "alembic upgrade head && python app/database/seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8001"
+CMD sh -c "\
+  if [ \"$RUN_MIGRATIONS\" = 'true' ]; then alembic upgrade head; fi && \
+  if [ \"$RUN_SEED\" = 'true' ]; then python app/database/seed.py; fi && \
+  uvicorn app.main:app --host 0.0.0.0 --port 8001"
+

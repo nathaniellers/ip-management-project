@@ -16,6 +16,7 @@ class UserJWT(BaseModel):
 	name: str
 	email: EmailStr
 	role: str
+	session_id: str
 
 	@field_serializer("id")
 	def serialize_id(self, value: UUID, _info):

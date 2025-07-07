@@ -8,7 +8,10 @@ class Settings(BaseSettings):
 	REFRESH_TOKEN_EXPIRE_DAYS: int
 	REDIS_URL: str
 	AUTH_SERVICE_URL: str
-
+	AUDIT_SERVICE_URL: str
+	INTERNAL_KEY: str
+	ALLOWED_ORIGINS: str
+	
 	model_config = SettingsConfigDict(
 		env_file=".env",
 		env_file_encoding="utf-8",

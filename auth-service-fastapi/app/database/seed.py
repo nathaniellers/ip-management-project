@@ -3,12 +3,10 @@ from app.database.models import User
 from passlib.context import CryptContext
 import uuid
 
-# Initialize DB session and password hasher
 db = SessionLocal()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Configuration
-DEFAULT_ADMIN_EMAIL = "nathanielleromero18@gmail.com"
+DEFAULT_ADMIN_EMAIL = "admin@yopmail.com"
 DEFAULT_ADMIN_PASSWORD = "password"
 DEFAULT_ADMIN_NAME = "Super Admin"
 DEFAULT_ADMIN_ROLE = "admin"
