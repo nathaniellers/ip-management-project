@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
-from app.models import ActionType
 
 class IPCreate(BaseModel):
 	ip: str

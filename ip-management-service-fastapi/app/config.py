@@ -9,6 +9,8 @@ class Settings(BaseSettings):
   REDIS_URL: str
   ALLOWED_ORIGINS: str
   TIMEZONE: str
+  AUDIT_SERVICE_URL: str
+  INTERNAL_KEY: str
 
   class Config:
     env_file = ".env"
