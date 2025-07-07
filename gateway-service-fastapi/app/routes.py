@@ -26,11 +26,9 @@ async def proxy_login(request: Request):
 		if response.status_code != 200:
 			raise HTTPException(status_code=response.status_code, detail=response.text)
 
-		# Forward the response body
 		result = response.json()
 		proxy_response = JSONResponse(content=result, status_code=response.status_code)
 
-		# ✅ Forward the refresh_token cookie from auth service
 		if "set-cookie" in response.headers:
 			proxy_response.headers["set-cookie"] = response.headers["set-cookie"]
 
@@ -76,7 +74,7 @@ async def proxy_refresh_token(request: Request):
 		async with httpx.AsyncClient() as client:
 			response = await client.post(
 				f"{settings.AUTH_SERVICE_URL}/api/refresh",
-				json={"refresh_token": refresh_token},  # ✅ Fix: Send the body expected
+				json={"refresh_token": refresh_token},
 				headers={"Content-Type": "application/json"},
 				cookies=request.cookies
 			)
@@ -90,7 +88,6 @@ async def proxy_refresh_token(request: Request):
 				detail=response.json().get("detail", "Refresh failed")
 			)
 
-		# Forward access_token and set-cookie header
 		result = response.json()
 		proxy_response = JSONResponse(content=result, status_code=response.status_code)
 
