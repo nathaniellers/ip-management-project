@@ -1,4 +1,5 @@
-export const formatPHTime = (timestamp: string | Date): string => {
+export const formatTimestamp = (timestamp: string) => {
+  const date = new Date(timestamp)
   return new Intl.DateTimeFormat('en-PH', {
     timeZone: 'Asia/Manila',
     year: 'numeric',
@@ -7,5 +8,5 @@ export const formatPHTime = (timestamp: string | Date): string => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-  }).format(new Date(timestamp))
+  }).format(date)
 }

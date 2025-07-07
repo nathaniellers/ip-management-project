@@ -7,6 +7,9 @@ import { addIP, updateIP, deleteIP } from '../api/ip'
 import { IPEntry } from '../types/ip'
 import { useFetchIPs } from '../hooks/fetchIps'
 import { useDebounce } from 'use-debounce'
+import { confirmAction } from '../components/dialog/Confirm'
+import { showSuccess } from '../components/dialog/Success'
+import { showError } from '../components/dialog/Error'
 
 const Dashboard = () => {
   const { user } = useAuth()
@@ -33,12 +36,23 @@ const Dashboard = () => {
   }
 
   const handleDelete = async (id: string) => {
-    try {
-      await deleteIP(id)
-      refetch()
-    } catch (err) {
-      console.error('Failed to delete IP:', err)
-    }
+    const result = await confirmAction({
+      title: 'Delete IP?',
+      text: 'This will permanently remove the IP entry.',
+      icon: 'warning',
+      confirmButtonText: 'Yes, delete it!'
+    })    
+    
+    if (result.isConfirmed) {
+      try {
+        await deleteIP(id)
+        showSuccess('IP deleted')
+        refetch()
+      } catch (err) {
+        console.error('Failed to delete IP:', err)
+        showError('Delete Failed', 'Could not delete the IP address.')
+      }
+    }  
   }
 
   const handleSubmitDialog = async (data: { ip: string; label: string; comment?: string }) => {

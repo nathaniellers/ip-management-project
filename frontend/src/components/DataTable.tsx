@@ -1,9 +1,10 @@
 import {
   Table, TableHead, TableBody, TableRow, TableCell,
-  TablePagination, TextField, IconButton, Box
+  TablePagination, TextField, IconButton, Box, TableSortLabel
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import { useState } from 'react'
 
 interface Column {
   id: string
@@ -25,6 +26,7 @@ interface Props {
   onDelete?: (id: string) => void
   userId?: string
   userRole?: string
+  placeholder?: string
 }
 
 export default function DataTable({
@@ -40,20 +42,36 @@ export default function DataTable({
   onEdit,
   onDelete,
   userId,
-  userRole
+  userRole,
+  placeholder
 }: Props) {
+  const [orderBy, setOrderBy] = useState<string>('')
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+
+  const handleSort = (columnId: string) => {
+    const isAsc = orderBy === columnId && order === 'asc'
+    setOrderBy(columnId)
+    setOrder(isAsc ? 'desc' : 'asc')
+  }
+
+  const sortedData = [...data].sort((a, b) => {
+    const aVal = a[orderBy]
+    const bVal = b[orderBy]
+    if (aVal == null || bVal == null) return 0
+    if (aVal < bVal) return order === 'asc' ? -1 : 1
+    if (aVal > bVal) return order === 'asc' ? 1 : -1
+    return 0
+  })
+
   return (
     <Box>
       <TextField
-        label="Search"
+        label={placeholder}
         fullWidth
         margin="normal"
         value={search}
         onChange={e => onSearchChange(e.target.value)}
-        sx={{
-          mb: 2,
-          mt: 1
-        }}
+        sx={{ mb: 2, mt: 1 }}
       />
 
       <Box sx={{ overflowX: 'auto' }}>
@@ -61,15 +79,21 @@ export default function DataTable({
           <TableHead>
             <TableRow>
               {columns.map(col => (
-                <TableCell key={col.id} sx={{ whiteSpace: 'nowrap' }}>
-                  {col.label}
+                <TableCell key={col.id} sortDirection={orderBy === col.id ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === col.id}
+                    direction={orderBy === col.id ? order : 'asc'}
+                    onClick={() => handleSort(col.id)}
+                  >
+                    {col.label}
+                  </TableSortLabel>
                 </TableCell>
               ))}
               {(onEdit || onDelete) && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data && data.map((entry) => (
+            {sortedData.map((entry) => (
               <TableRow key={entry.id}>
                 {columns.map(col => (
                   <TableCell key={col.id}>

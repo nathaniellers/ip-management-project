@@ -3,4 +3,5 @@ export interface UserPayload {
   email: string
   full_name: string
   role: 'admin' | 'user'
+  session_id: string
 }

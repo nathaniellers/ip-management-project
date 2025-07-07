@@ -8,7 +8,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { validateIPForm } from './validation/ipValidation'
-import { confirmUpdate } from './dialog/Confirm'
+import { confirmAction } from './dialog/Confirm'
 import { showSuccess } from './dialog/Success'
 
 interface Props {
@@ -57,12 +57,19 @@ export default function IPDialog({
     }
 
     if (isEdit) {
-      const confirmed = await confirmUpdate()
-      if (confirmed.isConfirmed) {
+      const result = await confirmAction({
+        title: 'Confirm Update',
+        text: 'Are you sure you want to update this IP address?',
+        icon: 'warning',
+        confirmButtonText: 'Yes, update it!',
+      })
+
+      if (result.isConfirmed) {
         onSubmit(payload)
         onClose()
         showSuccess()
       }
+
     } else {
       onSubmit(payload)
       onClose()

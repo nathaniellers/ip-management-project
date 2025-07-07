@@ -1,7 +1,9 @@
 import api from '../utils/axios'
 
 export const loginUser = async (email: string, password: string) => {
-  const res = await api.post('/login', { email, password })
+  const res = await api.post('/login', { email, password }, {
+    withCredentials: true,
+  })
   return res.data
 }
 
@@ -15,7 +17,7 @@ export const registerUser = async (
 }
 
 export const logoutUser = async () => {
-  const res = await api.post('/logout')
+  const res = await api.post('/logout', {})
   return res.data
 }
 

@@ -1,9 +1,11 @@
 export interface AuditEntry {
   id: string
-  ip: string
-  actor_id: string
-  ip_id: string | null
-  action: 'login' | 'logout' | 'create' | 'update' | 'delete'
   timestamp: string
-  details?: string
+  session_id: string
+  actor_id: string
+  name: string
+  ip: string
+  action?: string
+  resource?: string
+  details: string
 }

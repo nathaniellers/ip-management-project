@@ -15,7 +15,10 @@ import { showError } from '../components/dialog/Error'
 import { UserPayload } from '../types/user'
 import ValidatedTextField from '../components/validatedTextField'
 import { handleInputChange } from '../utils/setter'
-import { validateEmail, validatePassword } from '../components/validation/registerValidation'
+import {
+  validateEmail,
+  validatePassword,
+} from '../components/validation/registerValidation'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -25,7 +28,9 @@ const Login = () => {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+
     const emailErr = validateEmail(email)
     const passwordErr = validatePassword(password)
 
@@ -38,15 +43,15 @@ const Login = () => {
       const response = await loginUser(email, password)
       const { access_token } = response
       const decoded: any = decodeJwt(access_token)
-
-      const { id, name: full_name, email: user_email, role } = decoded.user
-      
-      const user: UserPayload = { id, full_name, email: user_email, role }
-
+      const { id, name: full_name, email: user_email, role, session_id } = decoded.user
+      const user: UserPayload = { id, full_name, email: user_email, role, session_id }
+            
       login(access_token, user)
       showSuccess('Login Successful', 'You may now proceed to dashboard.')
       navigate('/dashboard')
     } catch (err) {
+      console.log(err);
+      
       showError('Login Failed')
     }
   }
@@ -54,7 +59,8 @@ const Login = () => {
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
       <Typography variant="h4" gutterBottom>Login</Typography>
-       <ValidatedTextField
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <ValidatedTextField
           label="Email"
           value={email}
           onChange={handleInputChange(setEmail, setEmailError)}
@@ -67,12 +73,18 @@ const Login = () => {
           error={passwordError}
           type="password"
         />
-      <Box mt={2}>
-        <Button variant="contained" fullWidth onClick={handleSubmit}>Login</Button>
+        <Box mt={2}>
+          <Button variant="contained" fullWidth type="submit">
+            Login
+          </Button>
+        </Box>
+        <Link
+          href="/register"
+          sx={{ fontWeight: 'bold', marginTop: '10px', textAlign: 'center', display: 'block' }}
+        >
+          Create Account
+        </Link>
       </Box>
-      <Link href="/register" sx={{ fontWeight: 'bold', marginTop: '10px', textAlign: 'center', display: 'block' }}>
-        Create Account
-      </Link>
     </Container>
   )
 }

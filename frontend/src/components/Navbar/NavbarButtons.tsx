@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
 import { logoutUser } from '../../api/auth'
 import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 
 interface Props {
   token: string | null
@@ -40,7 +41,7 @@ const NavbarButtons = ({ token, user, toggleColorMode, onLogout }: Props) => {
         </IconButton>
       ) : (
         <Button color="inherit" onClick={() => navigate('/login')}>
-          Login
+          <LoginIcon/>
         </Button>
       )}
     </>

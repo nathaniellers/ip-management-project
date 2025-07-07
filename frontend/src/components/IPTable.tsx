@@ -52,6 +52,7 @@ export default function IPTable({
       onDelete={onDelete}
       userId={userId}
       userRole={userRole}
+      placeholder='Search for IP Address..'
     />
   )
 }
