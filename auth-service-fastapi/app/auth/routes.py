@@ -40,16 +40,13 @@ async def login_token(request: Request, form_data: Annotated[OAuth2PasswordReque
 
 @router.post("/refresh")
 async def refresh_token_route(request: Request):
-	# Step 1: Extract cookie value
 	cookie = request.cookies.get("refresh_token")
-	
+
 	if not cookie:
 		raise HTTPException(status_code=401, detail="Missing refresh token")
 
-	# Step 2: If it's a JSON string or dict, extract the actual token
 	refresh_token = None
 	if isinstance(cookie, str) and cookie.startswith("{"):
-		# If cookie is a stringified JSON, parse it
 		import json
 		try:
 			parsed = json.loads(cookie)
@@ -59,12 +56,10 @@ async def refresh_token_route(request: Request):
 	elif isinstance(cookie, dict):
 		refresh_token = cookie.get("refresh_token")
 	else:
-		# Assume it's a direct token string
 		refresh_token = cookie
 
 	if not refresh_token or not isinstance(refresh_token, str):
 		raise HTTPException(status_code=401, detail="Invalid refresh token format")
 
-	# Step 3: Call the actual logic
 	return await refresh_access_token(refresh_token, request)
 
