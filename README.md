@@ -31,8 +31,14 @@ The system follows a **Microservices Architecture** consisting of three key serv
 ## 🔐 Authentication & Authorization
 
 - Users authenticate via the **Auth Service**, receiving a **JWT token**.
-- Tokens support **automatic renewal** to avoid session interruptions.
-- Users are assigned roles (`User`, `Super Admin`) to control their access rights.
+- Tokens support **automatic renewal** to prevent session expiration.
+- A **Redis-based Token Blacklist** system is used to:
+  - 🛑 Invalidate tokens upon logout.
+  - 🚨 Revoke tokens when user privileges are changed or compromised.
+- Users are assigned roles (`User`, `Admin`) to control their access rights.
+
+> ❗ Blacklisted tokens are stored in **Redis** with TTL set to token expiration.  
+> ✅ All protected routes verify token validity and check Redis blacklist.
 
 ---
 
@@ -74,6 +80,7 @@ A robust, secure, and **tamper-proof audit system** includes:
 | Database     | PostgrelSQL (per service) |
 | Auth         | JWT (JSON Web Tokens) |
 | Communication | Internal API Calls via Gateway |
+| Cache / Token Blacklist | Redis 🚀 |
 | Testing      | SQLite
 
 > 📡 All frontend requests go **only** through the Gateway Service.  
@@ -97,8 +104,10 @@ A robust, secure, and **tamper-proof audit system** includes:
 ip-address-management/
 ├── gateway-service-fastapi/
 ├── auth-service-fastapi/
+│   └── redis/            # Token blacklist integration
 ├── ip-management-service-fastapi/
 ├── frontend/
+├── docker-compose.yml    # setup containers and database per service
 └── README.md
 ```
 
@@ -109,8 +118,16 @@ Microservices architecture
 Security best practices
 Audit and compliance logging
 API design and role-based access control
-🚀 Getting Started (Instructions Placeholder)
-🛠️ Installation and running instructions should be added here based on your environment setup.
+
+---
+
+🚀 Getting Started
+- Download docker [here](https://www.docker.com/products/docker-desktop/)
+- Download Redis [here](https://redis.io/downloads/)
+- Run ```docker-compose up --build``` inside ip-address-management folder
+  - run the application
+  - migrate tables
+  - seed admin user: __admin@yopmail.com__ password: __password__
 
 📣 Contributions
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -118,5 +135,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 🛡️ License
 Distributed under the MIT License. See LICENSE for more information.
 
-👦 Author
-Nathanielle M. Romero - [Linkedin 🔗](https://www.linkedin.com/in/nathanielle-romero-a2580020a/)
+--- 
+
+🧑‍💼 Nathanielle M. Romero - [Linkedin 🔗](https://www.linkedin.com/in/nathanielle-romero-a2580020a/)
